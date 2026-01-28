@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Subjects · Student Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>Subjects</h1>
+        <p class="hero-subtitle">
+            View and manage course subjects across departments.
+        </p>
+    </div>
+</section>
+
+<section class="panel-grid">
+    <article class="card form-card" id="subject-add-card">
+        <h3>Add Subject</h3>
+        <p class="card-help">
+            <span class="role-badge role-badge--admin">Admin Only</span>
+        </p>
+        <form id="subjects-create-form" class="form">
+            <div class="field-group">
+                <div class="field">
+                    <label>Subject Name</label>
+                    <input type="text" name="name" placeholder="e.g. Data Structures" required />
+                </div>
+                <div class="field">
+                    <label>Semester</label>
+                    <input type="number" name="semester" min="1" max="8" placeholder="1-8" required />
+                </div>
+                <div class="field">
+                    <label>Teacher</label>
+                    <input type="text" name="teacher" placeholder="e.g. Prof. Johnson" required />
+                </div>
+            </div>
+            <div class="field-group">
+                <div class="field">
+                    <label>Department ID</label>
+                    <input type="number" name="department_id" min="1" required />
+                </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Create Subject</button>
+        </form>
+        <div class="result" id="subjects-create-result"></div>
+    </article>
+
+    <article class="card">
+        <div class="card-header-inline">
+            <h3>All Subjects</h3>
+            <button class="btn btn-secondary btn-xs" type="button" id="subjects-refresh-btn">Refresh</button>
+        </div>
+        <div class="result" id="subjects-list-result"></div>
+        <div class="table-wrapper">
+            <table class="table" id="subjects-table"></table>
+        </div>
+    </article>
+</section>
+{% endblock %}

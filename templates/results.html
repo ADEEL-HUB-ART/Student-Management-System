@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Results · Student Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>Results</h1>
+        <p class="hero-subtitle">
+            View and manage student academic results.
+        </p>
+    </div>
+</section>
+
+<section class="panel-grid">
+    <article class="card form-card" id="result-add-card">
+        <h3>Add Result</h3>
+        <p class="card-help">
+            <span class="role-badge role-badge--teacher">Teacher</span>
+            <span class="role-badge role-badge--admin">Admin</span>
+        </p>
+        <form id="results-create-form" class="form">
+            <div class="field-group">
+                <div class="field">
+                    <label>Student ID</label>
+                    <input type="number" name="student_id" min="1" required />
+                </div>
+                <div class="field">
+                    <label>Subject ID</label>
+                    <input type="number" name="subject_id" min="1" required />
+                </div>
+            </div>
+            <div class="field-group">
+                <div class="field">
+                    <label>Midterm Marks</label>
+                    <input type="number" name="midterm_marks" min="0" max="100" required />
+                </div>
+                <div class="field">
+                    <label>Sessional Marks</label>
+                    <input type="number" name="sessional_marks" min="0" max="100" required />
+                </div>
+                <div class="field">
+                    <label>Final Marks</label>
+                    <input type="number" name="final_marks" min="0" max="100" required />
+                </div>
+            </div>
+            <div class="field-group">
+                <div class="field">
+                    <label>Total Marks</label>
+                    <input type="number" name="total_marks" min="0" max="300" required />
+                </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Create Result</button>
+        </form>
+        <div class="result" id="results-create-result"></div>
+    </article>
+
+    <article class="card">
+        <div class="card-header-inline">
+            <h3>View Results</h3>
+        </div>
+        <div class="student-toolbar">
+            <div class="student-search">
+                <input type="number" id="results-student-id-input" placeholder="Enter Student ID…" min="1" />
+            </div>
+            <button class="btn btn-secondary btn-xs" type="button" id="results-search-btn">Search</button>
+        </div>
+        <div class="result" id="results-list-result"></div>
+        <div class="table-wrapper">
+            <table class="table" id="results-table"></table>
+        </div>
+    </article>
+</section>
+{% endblock %}

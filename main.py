@@ -1,23 +1,112 @@
-import os
-import hashlib
-from datetime import datetime, timedelta, date
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.security import APIKeyHeader
+from datetime import date
+from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from jose import jwt, JWTError
 
 import models, schemas
-from database import engine, SessionLocal
-from ext import get_db, hash_password, verify_password, create_access_token, get_current_user, require_role, \
-    calculate_grade_point
+from database import engine
+from ext import (
+    get_db,
+    hash_password,
+    verify_password,
+    create_access_token,
+    get_current_user,
+    require_role,
+    require_roles,
+    calculate_grade_point,
+)
 
-# Create tables
+# Create tables on startup (for simple deployments / demos).
 models.Base.metadata.create_all(engine)
 
-app = FastAPI(title="Student Management System")
+app = FastAPI(
+    title="Student Management System",
+    description="Production-ready FastAPI backend for managing students, departments, subjects, results, fees, and clearance.",
+    version="1.0.0",
+)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def home_page(request: Request) -> HTMLResponse:
+    """Home: dashboard-centric view (requires login via frontend)."""
+    return templates.TemplateResponse("home.html", {"request": request})
 
+
+@app.get("/signup", response_class=HTMLResponse, include_in_schema=False)
+def signup_page(request: Request) -> HTMLResponse:
+    """Render standalone signup page."""
+    return templates.TemplateResponse("signup.html", {"request": request})
+
+
+@app.get("/login", response_class=HTMLResponse, include_in_schema=False)
+def login_page(request: Request) -> HTMLResponse:
+    """Render standalone login page."""
+    return templates.TemplateResponse("login.html", {"request": request})
+
+
+@app.get("/students-page", response_class=HTMLResponse, include_in_schema=False)
+def students_page(request: Request) -> HTMLResponse:
+    """Students management page (add + list)."""
+    return templates.TemplateResponse("students.html", {"request": request})
+
+
+@app.get("/departments-page", response_class=HTMLResponse, include_in_schema=False)
+def departments_page(request: Request) -> HTMLResponse:
+    """Departments management page."""
+    return templates.TemplateResponse("departments.html", {"request": request})
+
+
+@app.get("/subjects-page", response_class=HTMLResponse, include_in_schema=False)
+def subjects_page(request: Request) -> HTMLResponse:
+    """Subjects management page."""
+    return templates.TemplateResponse("subjects.html", {"request": request})
+
+
+@app.get("/results-page", response_class=HTMLResponse, include_in_schema=False)
+def results_page(request: Request) -> HTMLResponse:
+    """Results management page."""
+    return templates.TemplateResponse("results.html", {"request": request})
+
+
+@app.get("/fees-page", response_class=HTMLResponse, include_in_schema=False)
+def fees_page(request: Request) -> HTMLResponse:
+    """Fees management page."""
+    return templates.TemplateResponse("fees.html", {"request": request})
+
+
+@app.get("/clearance-page", response_class=HTMLResponse, include_in_schema=False)
+def clearance_page(request: Request) -> HTMLResponse:
+    """Clearance management page."""
+    return templates.TemplateResponse("clearance.html", {"request": request})
+
+
+@app.get("/gpa-page", response_class=HTMLResponse, include_in_schema=False)
+def gpa_page(request: Request) -> HTMLResponse:
+    """GPA Calculator page."""
+    return templates.TemplateResponse("gpa.html", {"request": request})
+
+
+@app.get("/announcements-page", response_class=HTMLResponse, include_in_schema=False)
+def announcements_page(request: Request) -> HTMLResponse:
+    """Announcements page."""
+    return templates.TemplateResponse("announcements.html", {"request": request})
+
+
+@app.get("/teachers-page", response_class=HTMLResponse, include_in_schema=False)
+def teachers_page(request: Request) -> HTMLResponse:
+    """Teachers directory page."""
+    return templates.TemplateResponse("teachers.html", {"request": request})
+
+
+@app.get("/profile-page", response_class=HTMLResponse, include_in_schema=False)
+def profile_page(request: Request) -> HTMLResponse:
+    """User profile page."""
+    return templates.TemplateResponse("profile.html", {"request": request})
 
 @app.post("/signup", tags=["Authentication"])
 def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -34,14 +123,14 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return {"message": "User registered successfully"}
 
 
-@app.post("/login", response_model=schemas.Token,tags=["Authentication"])
+@app.post("/login", response_model=schemas.Token, tags=["Authentication"])
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
     token = create_access_token({"sub": db_user.email})
-    return {"access_token": token, "token_type": "bearer"}
+    return {"access_token": token, "token_type": "bearer", "role": db_user.role}
 
 @app.post("/departments/", response_model=schemas.DepartmentResponse, tags=["Departments"])
 def create_department(department: schemas.DepartmentCreate, db: Session = Depends(get_db),
@@ -59,7 +148,7 @@ def get_departments(db: Session = Depends(get_db),
 
 @app.post("/subjects/", response_model=schemas.SubjectResponse, tags=["Subjects"])
 def create_subject(subject: schemas.SubjectCreate, db: Session = Depends(get_db),
-                  current_user: models.User = Depends(get_current_user)):
+                  current_user: models.User = Depends(require_role("admin"))):
     new_subject = models.Subject(**subject.dict())
     db.add(new_subject)
     db.commit()
@@ -81,7 +170,7 @@ def get_subjects_by_department_semester(department_id: int, semester: int, db: S
 
 @app.post("/results/", response_model=schemas.ResultResponse, tags=["Results"])
 def create_result(result: schemas.ResultCreate, db: Session = Depends(get_db),
-                 current_user: models.User = Depends(require_role("teacher"))):
+                 current_user: models.User = Depends(require_roles("teacher", "admin"))):
     new_result = models.Result(**result.dict())
     db.add(new_result)
     db.commit()
@@ -93,9 +182,9 @@ def get_student_results(student_id: int, db: Session = Depends(get_db),
                        current_user: models.User = Depends(get_current_user)):
     return db.query(models.Result).filter(models.Result.student_id == student_id).all()
 
-@app.post("/students/", response_model=schemas.StudentResponse,tags=["Students"])
+@app.post("/students/", response_model=schemas.StudentResponse, tags=["Students"])
 def create_student(student: schemas.StudentCreate, db: Session = Depends(get_db), 
-                  current_user: models.User = Depends(get_current_user)):
+                  current_user: models.User = Depends(require_role("admin"))):
     new_student = models.Student(**student.dict())
     db.add(new_student)
     db.commit()
@@ -299,3 +388,99 @@ def dashboard_stats(
         },
         "average_gpa": avg_gpa
     }
+
+
+# ------------------ ANNOUNCEMENTS ------------------
+@app.post("/announcements/", response_model=schemas.AnnouncementResponse, tags=["Announcements"])
+def create_announcement(announcement: schemas.AnnouncementCreate, db: Session = Depends(get_db),
+                       current_user: models.User = Depends(require_role("admin"))):
+    new_announcement = models.Announcement(
+        title=announcement.title,
+        content=announcement.content,
+        priority=announcement.priority,
+        posted_by=current_user.email
+    )
+    db.add(new_announcement)
+    db.commit()
+    db.refresh(new_announcement)
+    return {
+        "id": new_announcement.id,
+        "title": new_announcement.title,
+        "content": new_announcement.content,
+        "priority": new_announcement.priority,
+        "posted_by": new_announcement.posted_by,
+        "created_at": new_announcement.created_at.isoformat() if new_announcement.created_at else ""
+    }
+
+
+@app.get("/announcements/", tags=["Announcements"])
+def get_announcements(db: Session = Depends(get_db),
+                     current_user: models.User = Depends(get_current_user)):
+    announcements = db.query(models.Announcement).order_by(models.Announcement.created_at.desc()).all()
+    return [
+        {
+            "id": a.id,
+            "title": a.title,
+            "content": a.content,
+            "priority": a.priority,
+            "posted_by": a.posted_by,
+            "created_at": a.created_at.isoformat() if a.created_at else ""
+        }
+        for a in announcements
+    ]
+
+
+@app.delete("/announcements/{announcement_id}", tags=["Announcements"])
+def delete_announcement(announcement_id: int, db: Session = Depends(get_db),
+                       current_user: models.User = Depends(require_role("admin"))):
+    announcement = db.query(models.Announcement).filter(models.Announcement.id == announcement_id).first()
+    if not announcement:
+        raise HTTPException(status_code=404, detail="Announcement not found")
+    db.delete(announcement)
+    db.commit()
+    return {"message": "Announcement deleted successfully"}
+
+
+# ------------------ USER PROFILE ------------------
+@app.get("/profile/me", response_model=schemas.UserProfile, tags=["Profile"])
+def get_my_profile(current_user: models.User = Depends(get_current_user)):
+    return current_user
+
+
+@app.put("/profile/password", tags=["Profile"])
+def change_password(password_data: schemas.PasswordChange, db: Session = Depends(get_db),
+                   current_user: models.User = Depends(get_current_user)):
+    if not verify_password(password_data.current_password, current_user.password):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    current_user.password = hash_password(password_data.new_password)
+    db.commit()
+    return {"message": "Password changed successfully"}
+
+
+# ------------------ TEACHERS ------------------
+@app.get("/teachers/", tags=["Teachers"])
+def get_teachers(db: Session = Depends(get_db),
+                current_user: models.User = Depends(get_current_user)):
+    """Get unique list of teachers from subjects."""
+    subjects = db.query(models.Subject).all()
+    teachers = {}
+    for s in subjects:
+        if s.teacher not in teachers:
+            teachers[s.teacher] = {
+                "name": s.teacher,
+                "subjects": [],
+                "departments": set()
+            }
+        teachers[s.teacher]["subjects"].append(s.name)
+        teachers[s.teacher]["departments"].add(s.department_id)
+    
+    return [
+        {
+            "name": t["name"],
+            "subjects": t["subjects"],
+            "departments": list(t["departments"]),
+            "subject_count": len(t["subjects"])
+        }
+        for t in teachers.values()
+    ]

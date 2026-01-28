@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Login · Student Management System{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="auth-card">
+        <h1>Welcome back</h1>
+        <p class="auth-subtitle">Sign in to access your dashboard and student portal.</p>
+
+        <form id="login-form" class="form">
+            <div class="field">
+                <label>Email</label>
+                <input type="email" name="email" required placeholder="you@example.com" />
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" name="password" required />
+            </div>
+            <button class="btn btn-primary auth-btn" type="submit">Log In</button>
+        </form>
+        <div class="result" id="login-result"></div>
+
+        <p class="auth-link-text">
+            Don’t have an account?
+            <a href="/signup" class="auth-link">Sign up</a>
+        </p>
+    </div>
+</section>
+{% endblock %}
+

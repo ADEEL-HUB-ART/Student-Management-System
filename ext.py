@@ -47,6 +47,15 @@ def require_role(role: str):
     return role_checker
 
 
+def require_roles(*roles: str):
+    """Require user to have one of the specified roles."""
+    def role_checker(current_user: models.User = Depends(get_current_user)):
+        if current_user.role not in roles:
+            raise HTTPException(status_code=403, detail="Access denied")
+        return current_user
+    return role_checker
+
+
 def get_current_user(token: str = Depends(token_scheme), db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

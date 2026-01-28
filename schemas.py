@@ -66,6 +66,7 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    role: str
 
 class AdminCreate(BaseModel):
     email: EmailStr
@@ -107,3 +108,30 @@ class ClearanceResponse(ClearanceCreate):
     is_cleared: bool
     class Config:
         from_attributes = True
+
+
+# Announcement schemas
+class AnnouncementCreate(BaseModel):
+    title: str
+    content: str
+    priority: str = "normal"  # normal, important, urgent
+
+class AnnouncementResponse(AnnouncementCreate):
+    id: int
+    posted_by: str
+    created_at: str
+    class Config:
+        from_attributes = True
+
+
+# User profile schemas
+class UserProfile(BaseModel):
+    id: int
+    email: str
+    role: str
+    class Config:
+        from_attributes = True
+
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Fees · Student Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>💰 Fee Management</h1>
+        <p class="hero-subtitle">
+            Manage student fee payments and track payment status.
+        </p>
+    </div>
+</section>
+
+<section class="panel-grid">
+    <article class="card form-card" id="fee-add-card">
+        <h3>Add Fee Record</h3>
+        <p class="card-help">
+            <span class="role-badge role-badge--admin">Admin Only</span>
+        </p>
+        <form id="fees-create-form" class="form">
+            <div class="field-group">
+                <div class="field">
+                    <label>Student ID</label>
+                    <input type="number" name="student_id" min="1" required />
+                </div>
+                <div class="field">
+                    <label>Semester</label>
+                    <input type="number" name="semester" min="1" max="8" required />
+                </div>
+                <div class="field">
+                    <label>Total Fee (₨)</label>
+                    <input type="number" name="total_fee" min="0" step="0.01" required />
+                </div>
+            </div>
+            <div class="field-group">
+                <div class="field">
+                    <label>Paid Amount (₨)</label>
+                    <input type="number" name="paid_amount" min="0" step="0.01" value="0" />
+                </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Create Fee Record</button>
+        </form>
+        <div class="result" id="fees-create-result"></div>
+    </article>
+
+    <article class="card">
+        <div class="card-header-inline">
+            <h3>View Student Fees</h3>
+        </div>
+        <div class="student-toolbar">
+            <div class="student-search">
+                <input type="number" id="fees-student-id-input" placeholder="Enter Student ID…" min="1" />
+            </div>
+            <button class="btn btn-secondary btn-xs" type="button" id="fees-search-btn">Search</button>
+        </div>
+        <div class="result" id="fees-list-result"></div>
+        <div id="fees-summary" class="fees-summary"></div>
+        <div class="table-wrapper">
+            <table class="table" id="fees-table"></table>
+        </div>
+    </article>
+</section>
+
+<section class="panel-grid panel-grid--wide" id="fee-update-section" style="display: none;">
+    <article class="card form-card">
+        <h3>Update Payment</h3>
+        <p class="card-help">
+            <span class="role-badge role-badge--admin">Admin Only</span>
+            Add payment to an existing fee record
+        </p>
+        <form id="fees-update-form" class="form">
+            <div class="field-group">
+                <div class="field">
+                    <label>Fee Record ID</label>
+                    <input type="number" name="fee_id" id="fee-update-id" min="1" required />
+                </div>
+                <div class="field">
+                    <label>Payment Amount (₨)</label>
+                    <input type="number" name="paid_amount" min="0" step="0.01" required />
+                </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Add Payment</button>
+        </form>
+        <div class="result" id="fees-update-result"></div>
+    </article>
+</section>
+{% endblock %}

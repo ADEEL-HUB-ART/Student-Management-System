@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Announcements · Student Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>📢 Announcements</h1>
+        <p class="hero-subtitle">
+            Important notices and updates for students and staff.
+        </p>
+    </div>
+</section>
+
+<section class="panel-grid">
+    <article class="card form-card" id="announcement-add-card">
+        <h3>Post Announcement</h3>
+        <p class="card-help">
+            <span class="role-badge role-badge--admin">Admin Only</span>
+        </p>
+        <form id="announcements-create-form" class="form">
+            <div class="field">
+                <label>Title</label>
+                <input type="text" name="title" placeholder="Announcement title…" required />
+            </div>
+            <div class="field">
+                <label>Content</label>
+                <textarea name="content" rows="4" placeholder="Announcement details…" required
+                    class="textarea-field"></textarea>
+            </div>
+            <div class="field">
+                <label>Priority</label>
+                <select name="priority">
+                    <option value="normal">Normal</option>
+                    <option value="important">Important</option>
+                    <option value="urgent">Urgent</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" type="submit">Post Announcement</button>
+        </form>
+        <div class="result" id="announcements-create-result"></div>
+    </article>
+
+    <article class="card">
+        <div class="card-header-inline">
+            <h3>Recent Announcements</h3>
+            <button class="btn btn-secondary btn-xs" type="button" id="announcements-refresh-btn">Refresh</button>
+        </div>
+        <div class="result" id="announcements-list-result"></div>
+        <div class="announcements-list" id="announcements-list"></div>
+    </article>
+</section>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}GPA Calculator · Student Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>📊 GPA / CGPA Calculator</h1>
+        <p class="hero-subtitle">
+            Calculate semester GPA and cumulative CGPA for students.
+        </p>
+    </div>
+</section>
+
+<section class="panel-grid">
+    <article class="card">
+        <h3>Calculate GPA</h3>
+        <form id="gpa-form" class="form">
+            <div class="field-group">
+                <div class="field">
+                    <label>Student ID</label>
+                    <input type="number" name="student_id" id="gpa-student-id" min="1" required />
+                </div>
+                <div class="field">
+                    <label>Semester</label>
+                    <input type="number" name="semester" id="gpa-semester" min="1" max="8" required />
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" type="submit">Calculate GPA</button>
+                <button class="btn btn-secondary" type="button" id="cgpa-btn">Calculate CGPA</button>
+            </div>
+        </form>
+        <div class="result" id="gpa-result"></div>
+    </article>
+
+    <article class="card gpa-display-card" id="gpa-display-card" style="display: none;">
+        <div class="gpa-header">
+            <h3>Academic Performance</h3>
+            <span id="gpa-student-info" class="gpa-student-info"></span>
+        </div>
+        <div class="gpa-grid">
+            <div class="gpa-metric">
+                <div class="gpa-metric-label">Semester GPA</div>
+                <div class="gpa-metric-value" id="gpa-value">--</div>
+                <div class="gpa-bar-container">
+                    <div class="gpa-bar" id="gpa-bar"></div>
+                </div>
+            </div>
+            <div class="gpa-metric">
+                <div class="gpa-metric-label">Cumulative CGPA</div>
+                <div class="gpa-metric-value" id="cgpa-value">--</div>
+                <div class="gpa-bar-container">
+                    <div class="gpa-bar cgpa-bar" id="cgpa-bar"></div>
+                </div>
+            </div>
+        </div>
+        <div class="grade-scale">
+            <h4>Grade Scale</h4>
+            <div class="grade-items">
+                <span class="grade-item grade-a">A (85+) = 4.0</span>
+                <span class="grade-item grade-b-plus">B+ (75-84) = 3.5</span>
+                <span class="grade-item grade-b">B (65-74) = 3.0</span>
+                <span class="grade-item grade-c-plus">C+ (55-64) = 2.5</span>
+                <span class="grade-item grade-c">C (50-54) = 2.0</span>
+                <span class="grade-item grade-f">F (&lt;50) = 0.0</span>
+            </div>
+        </div>
+    </article>
+</section>
+{% endblock %}

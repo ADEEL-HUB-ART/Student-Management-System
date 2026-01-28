@@ -1,8 +1,8 @@
 from click import Choice
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, Date,Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, Date, Boolean, DateTime, Text
 from sqlalchemy.orm import relationship
 from database import Base
-from sqlalchemy import Column, Enum
+from datetime import datetime
 
 
 class Department(Base):
@@ -97,3 +97,14 @@ class Clearance(Base):
             self.hostel_clearance,
             self.department_clearance
         ])
+
+
+class Announcement(Base):
+    __tablename__ = "announcements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    content = Column(Text)
+    priority = Column(String, default="normal")  # normal, important, urgent
+    posted_by = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)

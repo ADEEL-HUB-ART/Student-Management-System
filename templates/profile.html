@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Profile · Student Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>👤 My Profile</h1>
+        <p class="hero-subtitle">
+            View your account information and manage settings.
+        </p>
+    </div>
+</section>
+
+<section class="panel-grid">
+    <article class="card profile-info-card">
+        <h3>Account Information</h3>
+        <div class="profile-details" id="profile-details">
+            <div class="profile-item">
+                <span class="profile-label">Email</span>
+                <span class="profile-value" id="profile-email">Loading...</span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">Role</span>
+                <span class="profile-value" id="profile-role">Loading...</span>
+            </div>
+            <div class="profile-item">
+                <span class="profile-label">User ID</span>
+                <span class="profile-value" id="profile-id">Loading...</span>
+            </div>
+        </div>
+        <div class="result" id="profile-load-result"></div>
+    </article>
+
+    <article class="card form-card">
+        <h3>🔐 Change Password</h3>
+        <form id="password-change-form" class="form">
+            <div class="field">
+                <label>Current Password</label>
+                <input type="password" name="current_password" required />
+            </div>
+            <div class="field">
+                <label>New Password</label>
+                <input type="password" name="new_password" required />
+            </div>
+            <div class="field">
+                <label>Confirm New Password</label>
+                <input type="password" name="confirm_password" required />
+            </div>
+            <button class="btn btn-primary" type="submit">Update Password</button>
+        </form>
+        <div class="result" id="password-change-result"></div>
+    </article>
+</section>
+
+<section class="panel-grid panel-grid--wide">
+    <article class="card">
+        <h3>⚙️ Quick Actions</h3>
+        <div class="quick-actions">
+            <button class="btn btn-secondary" id="btn-clear-cache">Clear Local Storage</button>
+            <button class="btn btn-danger-soft" id="btn-logout-all">Logout</button>
+        </div>
+    </article>
+</section>
+{% endblock %}

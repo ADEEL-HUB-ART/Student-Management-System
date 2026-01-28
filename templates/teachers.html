@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Teachers · Student Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>👨‍🏫 Teachers Directory</h1>
+        <p class="hero-subtitle">
+            Browse faculty members and their assigned subjects.
+        </p>
+    </div>
+</section>
+
+<section>
+    <article class="card">
+        <div class="card-header-inline">
+            <h3>All Teachers</h3>
+            <button class="btn btn-secondary btn-xs" type="button" id="teachers-refresh-btn">Refresh</button>
+        </div>
+        <div class="result" id="teachers-list-result"></div>
+        <div class="teachers-grid" id="teachers-grid"></div>
+    </article>
+</section>
+{% endblock %}

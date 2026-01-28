@@ -1,0 +1,482 @@
+{% extends "base.html" %}
+
+{% block title %}Student Portal · Student Management System{% endblock %}
+
+{% block content %}
+<section class="hero portal-hero">
+    <div class="hero-text">
+        <h1>Student Portal · University Experience</h1>
+        <p class="hero-subtitle">
+            Use this web UI to exercise every major endpoint of your Student Management
+            API: authenticate, manage students, departments, subjects, results, fees,
+            clearance and view the admin dashboard — all from the browser.
+        </p>
+        <div class="hero-actions">
+            <a href="#portal" class="btn btn-primary">Open Student Portal</a>
+        </div>
+        <p class="hero-note">
+            After login, this portal automatically sends your JWT in the
+            <code>token</code> header for protected calls.
+        </p>
+        <div class="auth-status" id="auth-status">
+            <span class="auth-status-label">Not authenticated</span>
+        </div>
+        <div class="role-hints">
+            <span class="role-badge role-badge--admin">Admin</span>
+            <span class="role-hints-text">Can manage departments, fees, clearance, and dashboard.</span>
+        </div>
+        <div class="role-hints">
+            <span class="role-badge role-badge--teacher">Teacher</span>
+            <span class="role-hints-text">Can create results and view academic data.</span>
+        </div>
+        <div class="role-hints">
+            <span class="role-badge role-badge--student">Student</span>
+            <span class="role-hints-text">Can view own profile, results, GPA/CGPA, fees, and clearance.</span>
+        </div>
+    </div>
+    <div class="hero-panel">
+        <h2>Quick Start</h2>
+        <ol class="hero-steps">
+            <li>Sign up a user below (choose role: <code>admin</code>, <code>teacher</code>, or <code>student</code>).</li>
+            <li>Log in to get a JWT token.</li>
+            <li>Use the tabs to call APIs with the stored token.</li>
+        </ol>
+        <div class="tag-list">
+            <span class="tag">JWT Auth</span>
+            <span class="tag">Role-Based Access</span>
+            <span class="tag">FastAPI</span>
+            <span class="tag">Student Portal UI</span>
+        </div>
+    </div>
+</section>
+
+<section class="portal" id="portal">
+    <div class="tab-bar" role="tablist">
+        <button class="tab tab--active" data-tab="auth" type="button">Authentication</button>
+        <button class="tab" data-tab="students" type="button">Students</button>
+        <button class="tab" data-tab="academics" type="button">Departments & Subjects</button>
+        <button class="tab" data-tab="results" type="button">Results & GPA</button>
+        <button class="tab" data-tab="finance" type="button">Fees & Clearance</button>
+        <button class="tab" data-tab="dashboard" type="button">Admin Dashboard</button>
+    </div>
+
+    <!-- AUTH TAB -->
+    <section class="panel panel--active" id="panel-auth" aria-label="Authentication">
+        <div class="panel-grid">
+            <article class="card form-card">
+                <h3>Sign Up</h3>
+                <form id="form-signup" class="form">
+                    <div class="field">
+                        <label>Email</label>
+                        <input type="email" name="email" required placeholder="admin@example.com" />
+                    </div>
+                    <div class="field">
+                        <label>Password</label>
+                        <input type="password" name="password" required />
+                    </div>
+                    <div class="field">
+                        <label>Role</label>
+                        <select name="role" required>
+                            <option value="admin">admin</option>
+                            <option value="teacher">teacher</option>
+                            <option value="student" selected>student</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Create User</button>
+                </form>
+                <div class="result" id="result-signup"></div>
+            </article>
+
+            <article class="card form-card">
+                <h3>Login</h3>
+                <form id="form-login" class="form">
+                    <div class="field">
+                        <label>Email</label>
+                        <input type="email" name="email" required placeholder="admin@example.com" />
+                    </div>
+                    <div class="field">
+                        <label>Password</label>
+                        <input type="password" name="password" required />
+                    </div>
+                    <button class="btn btn-primary" type="submit">Login &amp; Store Token</button>
+                </form>
+                <div class="result" id="result-login"></div>
+                <div class="token-chip" id="token-chip" hidden>
+                    <span class="token-label">Active token:</span>
+                    <span class="token-value" id="token-preview"></span>
+                    <button type="button" class="token-clear" id="btn-clear-token">Clear</button>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- STUDENTS TAB -->
+    <section class="panel" id="panel-students" aria-label="Students">
+        <div class="panel-grid">
+            <article class="card form-card">
+                <h3>Create Student</h3>
+                <form id="form-create-student" class="form">
+                    <div class="field-group">
+                        <div class="field">
+                            <label>Name</label>
+                            <input type="text" name="name" required />
+                        </div>
+                        <div class="field">
+                            <label>Age</label>
+                            <input type="number" name="age" min="1" required />
+                        </div>
+                        <div class="field">
+                            <label>Semester</label>
+                            <input type="number" name="semester" min="1" required />
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <div class="field">
+                            <label>Department ID</label>
+                            <input type="number" name="department_id" min="1" required />
+                        </div>
+                        <div class="field">
+                            <label>Email</label>
+                            <input type="email" name="email" required />
+                        </div>
+                        <div class="field">
+                            <label>Roll No</label>
+                            <input type="text" name="roll_no" required />
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Create Student</button>
+                </form>
+                <div class="result" id="result-create-student"></div>
+            </article>
+
+            <article class="card">
+                <div class="card-header-inline">
+                    <h3>All Students</h3>
+                    <button class="btn btn-secondary btn-xs" type="button" id="btn-refresh-students">Refresh</button>
+                </div>
+                <div class="student-toolbar">
+                    <div class="student-search">
+                        <input type="text" id="input-student-search" placeholder="Search by name, email, or roll no…" />
+                    </div>
+                    <div class="student-actions">
+                        <span class="toolbar-hint">Click a row to open full student profile.</span>
+                    </div>
+                </div>
+                <div class="result" id="result-list-students"></div>
+                <div class="table-wrapper">
+                    <table class="table" id="table-students"></table>
+                </div>
+            </article>
+
+            <article class="card student-profile-card">
+                <div class="card-header-inline">
+                    <h3>Student 360° Profile</h3>
+                    <span class="profile-id-label" id="profile-student-label">No student selected</span>
+                </div>
+                <p class="card-help">
+                    Select a student from the table or enter an ID to see a consolidated view of personal info, GPA/CGPA,
+                    fees, clearance, and recent results.
+                </p>
+                <form id="form-load-student-profile" class="form-inline">
+                    <div class="field-inline">
+                        <label>Student ID</label>
+                        <input type="number" name="student_id" min="1" required />
+                    </div>
+                    <button class="btn btn-secondary btn-xs" type="submit">Load Profile</button>
+                    <button class="btn btn-secondary btn-xs btn-danger-soft" type="button" id="btn-delete-student">
+                        Delete Student (Admin)
+                    </button>
+                </form>
+                <div class="profile-grid">
+                    <section class="profile-section" id="profile-basic">
+                        <h4>Basic Info</h4>
+                        <div class="profile-kv-list" id="profile-basic-content"></div>
+                    </section>
+                    <section class="profile-section" id="profile-academic">
+                        <h4>Academic Summary</h4>
+                        <div class="profile-kv-list" id="profile-academic-content"></div>
+                    </section>
+                    <section class="profile-section" id="profile-fees">
+                        <h4>Fees</h4>
+                        <div class="profile-kv-list" id="profile-fees-content"></div>
+                    </section>
+                    <section class="profile-section" id="profile-clearance">
+                        <h4>Clearance</h4>
+                        <div class="profile-kv-list" id="profile-clearance-content"></div>
+                    </section>
+                </div>
+                <div class="table-wrapper profile-results-table">
+                    <table class="table" id="profile-results-table"></table>
+                </div>
+                <div class="result" id="result-student-profile"></div>
+            </article>
+        </div>
+    </section>
+
+    <!-- ACADEMICS TAB -->
+    <section class="panel" id="panel-academics" aria-label="Departments & Subjects">
+        <div class="panel-grid">
+            <article class="card form-card">
+                <h3>Create Department</h3>
+                <form id="form-create-department" class="form">
+                    <div class="field">
+                        <label>Name</label>
+                        <input type="text" name="name" required />
+                    </div>
+                    <div class="field">
+                        <label>Head of Department (HOD)</label>
+                        <input type="text" name="hod" required />
+                    </div>
+                    <button class="btn btn-primary" type="submit">Create Department</button>
+                </form>
+                <div class="result" id="result-create-department"></div>
+            </article>
+
+            <article class="card form-card">
+                <h3>Create Subject</h3>
+                <form id="form-create-subject" class="form">
+                    <div class="field-group">
+                        <div class="field">
+                            <label>Name</label>
+                            <input type="text" name="name" required />
+                        </div>
+                        <div class="field">
+                            <label>Semester</label>
+                            <input type="number" name="semester" min="1" required />
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <div class="field">
+                            <label>Teacher</label>
+                            <input type="text" name="teacher" required />
+                        </div>
+                        <div class="field">
+                            <label>Department ID</label>
+                            <input type="number" name="department_id" min="1" required />
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Create Subject</button>
+                </form>
+                <div class="result" id="result-create-subject"></div>
+            </article>
+        </div>
+
+        <div class="panel-grid panel-grid--wide">
+            <article class="card">
+                <div class="card-header-inline">
+                    <h3>Departments</h3>
+                    <button class="btn btn-secondary btn-xs" type="button" id="btn-refresh-departments">Refresh</button>
+                </div>
+                <div class="table-wrapper">
+                    <table class="table" id="table-departments"></table>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-header-inline">
+                    <h3>Subjects</h3>
+                    <button class="btn btn-secondary btn-xs" type="button" id="btn-refresh-subjects">Refresh</button>
+                </div>
+                <form id="form-filter-subjects" class="form-inline">
+                    <div class="field-inline">
+                        <label>Dept ID</label>
+                        <input type="number" name="department_id" min="1" />
+                    </div>
+                    <div class="field-inline">
+                        <label>Semester</label>
+                        <input type="number" name="semester" min="1" />
+                    </div>
+                    <button class="btn btn-secondary btn-xs" type="submit">Filter by Dept &amp; Semester</button>
+                </form>
+                <div class="table-wrapper">
+                    <table class="table" id="table-subjects"></table>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- RESULTS TAB -->
+    <section class="panel" id="panel-results" aria-label="Results & GPA">
+        <div class="panel-grid">
+            <article class="card form-card">
+                <h3>Create Result (Teacher)</h3>
+                <p class="card-help">Requires a user with role <code>teacher</code>.</p>
+                <form id="form-create-result" class="form">
+                    <div class="field-group">
+                        <div class="field">
+                            <label>Student ID</label>
+                            <input type="number" name="student_id" min="1" required />
+                        </div>
+                        <div class="field">
+                            <label>Subject ID</label>
+                            <input type="number" name="subject_id" min="1" required />
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <div class="field">
+                            <label>Midterm Marks</label>
+                            <input type="number" name="midterm_marks" min="0" required />
+                        </div>
+                        <div class="field">
+                            <label>Final Marks</label>
+                            <input type="number" name="final_marks" min="0" required />
+                        </div>
+                        <div class="field">
+                            <label>Sessional Marks</label>
+                            <input type="number" name="sessional_marks" min="0" required />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Total Marks</label>
+                        <input type="number" name="total_marks" min="0" required />
+                    </div>
+                    <button class="btn btn-primary" type="submit">Create Result</button>
+                </form>
+                <div class="result" id="result-create-result"></div>
+            </article>
+
+            <article class="card">
+                <h3>Student Results & GPA</h3>
+                <form id="form-student-results" class="form-inline">
+                    <div class="field-inline">
+                        <label>Student ID</label>
+                        <input type="number" name="student_id" min="1" required />
+                    </div>
+                    <button class="btn btn-secondary btn-xs" type="submit">Load Results</button>
+                </form>
+                <form id="form-student-gpa" class="form-inline">
+                    <div class="field-inline">
+                        <label>Student ID</label>
+                        <input type="number" name="student_id" min="1" required />
+                    </div>
+                    <div class="field-inline">
+                        <label>Semester</label>
+                        <input type="number" name="semester" min="1" required />
+                    </div>
+                    <button class="btn btn-secondary btn-xs" type="submit">Calculate GPA</button>
+                </form>
+                <form id="form-student-cgpa" class="form-inline">
+                    <div class="field-inline">
+                        <label>Student ID</label>
+                        <input type="number" name="student_id" min="1" required />
+                    </div>
+                    <button class="btn btn-secondary btn-xs" type="submit">Calculate CGPA</button>
+                </form>
+                <div class="result" id="result-student-results"></div>
+                <div class="table-wrapper">
+                    <table class="table" id="table-results"></table>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- FINANCE TAB -->
+    <section class="panel" id="panel-finance" aria-label="Fees & Clearance">
+        <div class="panel-grid">
+            <article class="card form-card">
+                <h3>Create / Update Fee (Admin)</h3>
+                <p class="card-help">Creating fees requires role <code>admin</code>.</p>
+                <form id="form-create-fee" class="form">
+                    <div class="field-group">
+                        <div class="field">
+                            <label>Student ID</label>
+                            <input type="number" name="student_id" min="1" required />
+                        </div>
+                        <div class="field">
+                            <label>Semester</label>
+                            <input type="number" name="semester" min="1" required />
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <div class="field">
+                            <label>Total Fee</label>
+                            <input type="number" name="total_fee" min="0" step="0.01" required />
+                        </div>
+                        <div class="field">
+                            <label>Paid Amount</label>
+                            <input type="number" name="paid_amount" min="0" step="0.01" required />
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Create Fee Record</button>
+                </form>
+                <div class="result" id="result-create-fee"></div>
+
+                <h4>Update Existing Fee (Add Payment)</h4>
+                <form id="form-update-fee" class="form-inline">
+                    <div class="field-inline">
+                        <label>Fee ID</label>
+                        <input type="number" name="fee_id" min="1" required />
+                    </div>
+                    <div class="field-inline">
+                        <label>Paid Amount</label>
+                            <input type="number" name="paid_amount" min="0" step="0.01" required />
+                    </div>
+                    <button class="btn btn-secondary btn-xs" type="submit">Apply Payment</button>
+                </form>
+                <div class="result" id="result-update-fee"></div>
+            </article>
+
+            <article class="card">
+                <h3>Student Fees & Clearance</h3>
+                <form id="form-student-fees" class="form-inline">
+                    <div class="field-inline">
+                        <label>Student ID</label>
+                        <input type="number" name="student_id" min="1" required />
+                    </div>
+                    <button class="btn btn-secondary btn-xs" type="submit">Load Fees</button>
+                </form>
+                <form id="form-create-clearance" class="form-inline">
+                    <div class="field-inline">
+                        <label>Student ID</label>
+                        <input type="number" name="student_id" min="1" required />
+                    </div>
+                    <div class="field-inline">
+                        <label>All Cleared?</label>
+                        <select name="cleared" required>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary btn-xs" type="submit">Create / Update Clearance</button>
+                </form>
+                <form id="form-get-clearance" class="form-inline">
+                    <div class="field-inline">
+                        <label>Student ID</label>
+                        <input type="number" name="student_id" min="1" required />
+                    </div>
+                    <button class="btn btn-secondary btn-xs" type="submit">Get Clearance</button>
+                </form>
+                <form id="form-results-cleared" class="form-inline">
+                    <div class="field-inline">
+                        <label>Student ID</label>
+                        <input type="number" name="student_id" min="1" required />
+                    </div>
+                    <button class="btn btn-secondary btn-xs" type="submit">Results (If Cleared)</button>
+                </form>
+                <div class="result" id="result-student-fees"></div>
+                <div class="table-wrapper">
+                    <table class="table" id="table-fees"></table>
+                </div>
+                <div class="result" id="result-clearance"></div>
+                <div class="table-wrapper">
+                    <table class="table" id="table-results-cleared"></table>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- DASHBOARD TAB -->
+    <section class="panel" id="panel-dashboard" aria-label="Dashboard">
+        <article class="card">
+            <div class="card-header-inline">
+                <h3>Admin Dashboard (Summary)</h3>
+                <button class="btn btn-primary btn-xs" type="button" id="btn-load-dashboard">Load Dashboard</button>
+            </div>
+            <p class="card-help">
+                Requires a user with role <code>admin</code>. Make sure you are logged in as an admin user.
+            </p>
+            <div class="dashboard-grid" id="dashboard-grid"></div>
+        </article>
+    </section>
+</section>
+{% endblock %}

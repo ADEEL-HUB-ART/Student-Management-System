@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Home · Student Management System{% endblock %}
+
+{% block content %}
+<section class="hero portal-hero">
+    <div class="hero-text">
+        <h1>🎓 Student Management Dashboard</h1>
+        <p class="hero-subtitle">
+            Complete academic management system. Manage students, academics, finances, and more.
+        </p>
+        <p class="hero-note">
+            Welcome! Use the quick actions or navigation to access different modules.
+        </p>
+    </div>
+    <div class="hero-panel">
+        <h2>Quick Actions</h2>
+        <div class="hero-actions-grid">
+            <a href="/students-page" class="action-card">
+                <span class="action-icon">👥</span>
+                <span class="action-label">Students</span>
+            </a>
+            <a href="/departments-page" class="action-card">
+                <span class="action-icon">🏛️</span>
+                <span class="action-label">Departments</span>
+            </a>
+            <a href="/subjects-page" class="action-card">
+                <span class="action-icon">📚</span>
+                <span class="action-label">Subjects</span>
+            </a>
+            <a href="/results-page" class="action-card">
+                <span class="action-icon">📝</span>
+                <span class="action-label">Results</span>
+            </a>
+            <a href="/fees-page" class="action-card">
+                <span class="action-icon">💰</span>
+                <span class="action-label">Fees</span>
+            </a>
+            <a href="/clearance-page" class="action-card">
+                <span class="action-icon">✅</span>
+                <span class="action-label">Clearance</span>
+            </a>
+            <a href="/gpa-page" class="action-card">
+                <span class="action-icon">📊</span>
+                <span class="action-label">GPA Calc</span>
+            </a>
+            <a href="/teachers-page" class="action-card">
+                <span class="action-icon">👨‍🏫</span>
+                <span class="action-label">Teachers</span>
+            </a>
+        </div>
+        <div class="tag-list">
+            <span class="tag">Dashboard</span>
+            <span class="tag" id="user-role-tag">Loading...</span>
+        </div>
+    </div>
+</section>
+
+<section class="home-grid">
+    <article class="card">
+        <div class="card-header-inline">
+            <h3>📊 System Statistics</h3>
+            <button class="btn btn-primary btn-xs" type="button" id="btn-home-load-dashboard">Refresh</button>
+        </div>
+        <p class="card-help">
+            Aggregated statistics across all modules.
+        </p>
+        <div class="dashboard-grid" id="home-dashboard-grid"></div>
+    </article>
+
+    <article class="card">
+        <div class="card-header-inline">
+            <h3>📢 Recent Announcements</h3>
+            <a href="/announcements-page" class="btn btn-secondary btn-xs">View All</a>
+        </div>
+        <div class="announcements-preview" id="home-announcements"></div>
+    </article>
+</section>
+{% endblock %}

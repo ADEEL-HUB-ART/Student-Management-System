@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Clearance · Student Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>✅ Clearance Management</h1>
+        <p class="hero-subtitle">
+            Manage student clearance status across all departments.
+        </p>
+    </div>
+</section>
+
+<section class="panel-grid">
+    <article class="card form-card" id="clearance-add-card">
+        <h3>Create/Update Clearance</h3>
+        <p class="card-help">
+            <span class="role-badge role-badge--admin">Admin Only</span>
+        </p>
+        <form id="clearance-create-form" class="form">
+            <div class="field-group">
+                <div class="field">
+                    <label>Student ID</label>
+                    <input type="number" name="student_id" min="1" required />
+                </div>
+            </div>
+            <div class="clearance-checkboxes">
+                <label class="checkbox-field">
+                    <input type="checkbox" name="library_clearance" />
+                    <span class="checkbox-label">📚 Library Clearance</span>
+                </label>
+                <label class="checkbox-field">
+                    <input type="checkbox" name="finance_clearance" />
+                    <span class="checkbox-label">💰 Finance Clearance</span>
+                </label>
+                <label class="checkbox-field">
+                    <input type="checkbox" name="hostel_clearance" />
+                    <span class="checkbox-label">🏠 Hostel Clearance</span>
+                </label>
+                <label class="checkbox-field">
+                    <input type="checkbox" name="department_clearance" />
+                    <span class="checkbox-label">🎓 Department Clearance</span>
+                </label>
+            </div>
+            <button class="btn btn-primary" type="submit">Submit Clearance</button>
+        </form>
+        <div class="result" id="clearance-create-result"></div>
+    </article>
+
+    <article class="card">
+        <div class="card-header-inline">
+            <h3>Check Student Clearance</h3>
+        </div>
+        <div class="student-toolbar">
+            <div class="student-search">
+                <input type="number" id="clearance-student-id-input" placeholder="Enter Student ID…" min="1" />
+            </div>
+            <button class="btn btn-secondary btn-xs" type="button" id="clearance-search-btn">Search</button>
+        </div>
+        <div class="result" id="clearance-list-result"></div>
+        <div id="clearance-status-card" class="clearance-status-card" style="display: none;">
+            <div class="clearance-header">
+                <h4>Clearance Status for Student #<span id="clearance-student-display"></span></h4>
+                <span id="clearance-overall-badge" class="clearance-badge"></span>
+            </div>
+            <div class="clearance-items">
+                <div class="clearance-item" id="clearance-library">
+                    <span class="clearance-icon">📚</span>
+                    <span class="clearance-name">Library</span>
+                    <span class="clearance-status"></span>
+                </div>
+                <div class="clearance-item" id="clearance-finance">
+                    <span class="clearance-icon">💰</span>
+                    <span class="clearance-name">Finance</span>
+                    <span class="clearance-status"></span>
+                </div>
+                <div class="clearance-item" id="clearance-hostel">
+                    <span class="clearance-icon">🏠</span>
+                    <span class="clearance-name">Hostel</span>
+                    <span class="clearance-status"></span>
+                </div>
+                <div class="clearance-item" id="clearance-department">
+                    <span class="clearance-icon">🎓</span>
+                    <span class="clearance-name">Department</span>
+                    <span class="clearance-status"></span>
+                </div>
+            </div>
+        </div>
+    </article>
+</section>
+{% endblock %}

@@ -1,76 +1,96 @@
-## Setup
+## Student Management System API (FastAPI)
 
-1. Install de```
+This project is a production-ready backend for managing academic and administrative data in a school or university.
+It is built with **FastAPI**, **SQLAlchemy**, and **PostgreSQL/SQLite**, secured with **JWT authentication**
+and **role-based access control** (`admin`, `teacher`, `student`).
 
-2. Set environment variables:
-```bash
-cp .env.example .env
-# Edit .env with your values
-```
+The system manages students, departments, subjects, results, fees, and clearance, and exposes analytics such as
+GPA/CGPA and dashboard statistics.
 
-3. Run the application:
-```bash
-uvicorn main:app --reload
-```
+---
 
-## API Endpoints
+### Features
 
-- `POST /signup` - Register new user
-- `POST /login` - Login and get token
-- `GET /students/` - List all students (protected)
-- `POST /students/` - Create student (protected)
-- `GET /students/{id}` - Get student by ID (protected)
-- `PUT /students/{id}` - Update student (protected)
-- `DELETE /students/{id}` - Delete student (protected)
+- **Authentication & Authorization**
+  - `POST /signup` – register new users
+  - `POST /login` – issue JWT access tokens
+  - Role-based access control using `admin`, `teacher`, and `student` roles
 
-## Authentication
+- **Core Academic Management**
+  - Students: CRUD operations on `students`
+  - Departments: CRUD via `/departments`
+  - Subjects: CRUD and per-department / per-semester listing
 
-Use the token from `/login` in the Authorization header:
-```
-Authorization: Bearer <your-token>
-```
-=======
-Student Management System (Backend API)
+- **Results & Analytics**
+  - Record results with midterm, final, and sessional marks
+  - Compute **GPA** per semester and overall **CGPA**
 
-This project is a complete backend system for managing academic and administrative data of a school or university. It is built using FastAPI, SQLAlchemy, and PostgreSQL, and secured with JWT authentication and role-based access control (Admin, Teacher, Student).
+- **Fees & Clearance**
+  - Track total, paid, and due amounts for student fees
+  - Multi-stage clearance: library, finance, hostel, department
 
-The system allows institutions to manage students, departments, subjects, academic results, fees, and clearance status in a structured and secure way. It also provides analytical features such as GPA/CGPA calculation and an admin dashboard for system-wide statistics.
+- **Admin Dashboard**
+  - Aggregate statistics for students, fees, clearance, and average GPA
 
-✨ Key Features
+---
 
-🔐 JWT-based Authentication (Signup & Login)
+### Tech Stack
 
-👥 Role-Based Access Control (Admin / Teacher / Student)
+- **Backend**: FastAPI
+- **Database**: PostgreSQL (recommended) or SQLite (default for development)
+- **ORM**: SQLAlchemy
+- **Auth**: JWT (`python-jose`)
+- **Validation**: Pydantic models
 
-🎓 Student, Department, and Subject Management
+---
 
-📝 Result Management (Midterm, Final, Sessional, Total Marks)
+### Getting Started
 
-📊 GPA and CGPA Calculation
+1. **Install dependencies**
 
-💰 Fee Management (Paid, Due, Status Tracking)
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-🧾 Student Clearance System (Library, Finance, Hostel, Department)
+2. **Configure environment**
 
-📈 Admin Dashboard with system statistics
+   ```bash
+   cp .env.example .env
+   # Edit .env and set:
+   # SECRET_KEY=your-production-secret
+   # DATABASE_URL=postgresql://user:password@host:5432/database  # or use the default SQLite URL
+   ```
 
-🗄️ PostgreSQL Database with SQLAlchemy ORM
+3. **Run the application**
 
-📦 RESTful API with proper validation using Pydantic
+   ```bash
+   uvicorn main:app --reload
+   ```
 
-🛠 Tech Stack
+4. **Open the UI**
 
-Backend: FastAPI
+   - Human‑friendly landing page: `http://localhost:8000/`
+   - Swagger UI: `http://localhost:8000/docs`
+   - ReDoc: `http://localhost:8000/redoc`
 
-Database: PostgreSQL
+---
 
-ORM: SQLAlchemy
+### Authentication Details
 
-Authentication: JWT
+- First, create a user via:
 
-Validation: Pydantic
+  - `POST /signup`
 
-🎯 Purpose
+- Then log in with:
 
-This project demonstrates how a real-world university or school management backend can be designed using modern Python frameworks. It is suitable for learning, academic projects, and as a foundation for building a full-stack student portal.
->>>>>>> b9ad6a472f73db801f84ce61fea808fd67331fc4
+  - `POST /login`
+
+- Use the returned token in the `token` header for protected endpoints:
+
+  ```http
+  token: <your-jwt-token>
+  ```
+
+Admins and teachers have access to additional routes such as department management, result creation, fees,
+clearance, and the dashboard.
+

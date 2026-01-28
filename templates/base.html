@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Student Management API{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <div class="brand">
+                <span class="brand-logo">SMS</span>
+                <div class="brand-text">
+                    <span class="brand-title">Student Management System</span>
+                    <span class="brand-subtitle">FastAPI · PostgreSQL · JWT</span>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/students-page" class="nav-link">Students</a>
+                <a href="/departments-page" class="nav-link">Departments</a>
+                <a href="/subjects-page" class="nav-link">Subjects</a>
+                <a href="/results-page" class="nav-link">Results</a>
+                <a href="/fees-page" class="nav-link">Fees</a>
+                <a href="/announcements-page" class="nav-link">📢</a>
+                <a href="/profile-page" class="nav-link">👤</a>
+                <button type="button" class="nav-link nav-link--button" id="btn-logout">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-main">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <span>Student Management System API</span>
+            <span class="footer-meta">Built with FastAPI · Ready for production</span>
+        </div>
+    </footer>
+    <script src="{{ url_for('static', path='/js/app.js') }}"></script>
+</body>
+
+</html>

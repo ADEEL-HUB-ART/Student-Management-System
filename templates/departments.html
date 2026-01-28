@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Departments · Student Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1>Departments</h1>
+        <p class="hero-subtitle">
+            View and manage academic departments.
+        </p>
+    </div>
+</section>
+
+<section class="panel-grid">
+    <article class="card form-card" id="department-add-card">
+        <h3>Add Department</h3>
+        <p class="card-help">
+            <span class="role-badge role-badge--admin">Admin Only</span>
+        </p>
+        <form id="departments-create-form" class="form">
+            <div class="field-group">
+                <div class="field">
+                    <label>Department Name</label>
+                    <input type="text" name="name" placeholder="e.g. Computer Science" required />
+                </div>
+                <div class="field">
+                    <label>Head of Department (HOD)</label>
+                    <input type="text" name="hod" placeholder="e.g. Dr. Smith" required />
+                </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Create Department</button>
+        </form>
+        <div class="result" id="departments-create-result"></div>
+    </article>
+
+    <article class="card">
+        <div class="card-header-inline">
+            <h3>All Departments</h3>
+            <button class="btn btn-secondary btn-xs" type="button" id="departments-refresh-btn">Refresh</button>
+        </div>
+        <div class="result" id="departments-list-result"></div>
+        <div class="table-wrapper">
+            <table class="table" id="departments-table"></table>
+        </div>
+    </article>
+</section>
+{% endblock %}
